@@ -68,3 +68,29 @@ docker stop containerId
 1. put domain link in crossOrigin in env file in BE
 2. In FE inside useAuth put domain while setting token.
 
+
+
+#### Kubernets Deployment
+```yaml
+Metadata BLUE:
+  blue:
+    - namespace: nps-blue
+    - modules:
+      - mongodb
+          app: 
+          service:
+          deployment:
+      - backend
+      - frontend
+      - ingress
+Metadat GREEN:
+  green:
+    - namespace: nps-green
+```
+
+
+1. create namespace for blue & green environment
+```
+kubectl apply k8s/namespace.yml
+kubectl apply k8s/
+```

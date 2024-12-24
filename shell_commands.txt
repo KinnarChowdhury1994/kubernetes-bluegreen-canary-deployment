@@ -1,0 +1,8 @@
+NPS-Capstone-Project-5-POC - Kinnar Chowdhury
+
+
+nproc && free -m
+
+
+sudo apt update
+sudo apt upgrade -y

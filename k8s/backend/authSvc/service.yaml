@@ -11,21 +11,21 @@ spec:
     version: blue
   ports:
   - port: 80
-    targetPort: 5000
+    targetPort: 3001
   type: ClusterIP
 
 ---
-#! Green Service
-apiVersion: v1
-kind: Service
-metadata:
-  name: authSvc
-  namespace: nps-green
-spec:
-  selector:
-    app: authSvc
-    version: green
-  ports:
-  - port: 80
-    targetPort: 5000
-  type: ClusterIP
+# #! Green Service
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: authSvc
+#   namespace: nps-green
+# spec:
+#   selector:
+#     app: authSvc
+#     version: green
+#   ports:
+#   - port: 80
+#     targetPort: 3001
+#   type: ClusterIP

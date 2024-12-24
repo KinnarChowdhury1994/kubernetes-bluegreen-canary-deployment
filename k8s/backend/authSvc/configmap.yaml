@@ -5,13 +5,26 @@ metadata:
   namespace:  nps-blue
 data:
   PORT: "3001"
+  MONGO_URI: "mongodb://root:example@localhost:27017/nps"
+  AWS_KEY_ID: ""
+  AWS_SECRET_KEY: ""
+  AWS_REGION: "ap-south-1"
+  SENDING_EMAIL_THROUGH: "kinnarchowdhury@gmail.com"
+  SECURE_TOKEN: "false"
+  DOMAIN: ".localhost"
+  JWT_TOKEN: "31337someshittysecretwhichIProbablyWouldnthavecreatedunlessitwasreallyapaininass1337"
+  CROSS_ORIGIN: "http://localhost:3000"
+
+
 
 ---
 
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: nps-authsvc-configmap
-  namespace:  nps-green
-data:
-  PORT: "3001"
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: nps-authsvc-configmap
+#   namespace:  nps-green
+# data:
+#   PORT: "3001"
+#   NODE_ENV: ""
+
