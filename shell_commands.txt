@@ -6,3 +6,136 @@ nproc && free -m
 
 sudo apt update
 sudo apt upgrade -y
+
+
+# https://docs.docker.com/engine/install/ubuntu/
+
+sudo apt-get install ca-certificates curl
+
+sudo install -m 0755 -d /etc/apt/keyrings
+
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt-get update
+
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
+
+sudo docker version
+
+Client: Docker Engine - Community
+ Version:           27.4.1
+ API version:       1.47
+ Go version:        go1.22.10
+ Git commit:        b9d17ea
+ Built:             Tue Dec 17 15:45:46 2024
+ OS/Arch:           linux/amd64
+ Context:           default
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          27.4.1
+  API version:      1.47 (minimum version 1.24)
+  Go version:       go1.22.10
+  Git commit:       c710b88
+  Built:            Tue Dec 17 15:45:46 2024
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          1.7.24
+  GitCommit:        88bf19b2105c8b17560993bee28a01ddc2f97182
+ runc:
+  Version:          1.2.2
+  GitCommit:        v1.2.2-0-g7cb3632
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+
+
+
+# https://www.jenkins.io/doc/book/installing/docker/
+
+sudo apt install -y openjdk-21-jre-headless
+
+java --version
+        openjdk 21.0.5 2024-10-15
+        OpenJDK Runtime Environment (build 21.0.5+11-Ubuntu-1ubuntu124.04)
+        OpenJDK 64-Bit Server VM (build 21.0.5+11-Ubuntu-1ubuntu124.04, mixed mode, sharing)
+
+docker network create jenkins
+
+
+cd /home/ubuntu
+
+mkdir jenkins-docker-certs
+sudo chmod -R 777 jenkins-docker-certs/
+mkdir jenkins-data
+sudo chmod -R 777 jenkins-data/
+
+sudo docker run \
+  --name jenkins-docker \
+  --rm \
+  --detach \
+  --privileged \
+  --network jenkins \
+  --network-alias docker \
+  --env DOCKER_TLS_CERTDIR=/certs \
+  --volume /home/ubuntu/jenkins-docker-certs:/certs/client \
+  --volume /home/ubuntu/jenkins-data:/var/jenkins_home \
+  --publish 2376:2376 \
+  docker:dind \
+  --storage-driver overlay2
+
+
+
+# https://www.jenkins.io/doc/book/installing/linux/#debianubuntu
+
+sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt-get update
+sudo apt-get install jenkins
+
+sudo apt update
+sudo apt install fontconfig openjdk-17-jre
+java -version
+openjdk version "17.0.13" 2024-10-15
+OpenJDK Runtime Environment (build 17.0.13+11-Debian-2)
+OpenJDK 64-Bit Server VM (build 17.0.13+11-Debian-2, mixed mode, sharing)
+
+
+
+sudo systemctl enable docker jenkins
+
+sudo systemctl start jenkins docker
+
+sudo systemctl status jenkins
+● jenkins.service - Jenkins Continuous Integration Server
+     Loaded: loaded (/usr/lib/systemd/system/jenkins.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2024-12-24 20:28:07 UTC; 5min ago
+   Main PID: 31656 (java)
+      Tasks: 43 (limit: 4676)
+     Memory: 570.5M (peak: 577.3M)
+        CPU: 16.249s
+     CGroup: /system.slice/jenkins.service
+             └─31656 /usr/bin/java -Djava.awt.headless=true -jar /usr/share/java/jenkins.war --webroot=/var/cache/jenkins/war --httpP>
+
+Dec 24 20:28:02 ip-172-31-36-123 jenkins[31656]: 5c80562e32234e0181094bc008364d8f
+Dec 24 20:28:02 ip-172-31-36-123 jenkins[31656]: This may also be found at: /var/lib/jenkins/secrets/initialAdminPassword
+Dec 24 20:28:02 ip-172-31-36-123 jenkins[31656]: *************************************************************
+Dec 24 20:28:02 ip-172-31-36-123 jenkins[31656]: *************************************************************
+Dec 24 20:28:02 ip-172-31-36-123 jenkins[31656]: *************************************************************
+Dec 24 20:28:07 ip-172-31-36-123 jenkins[31656]: 2024-12-24 20:28:07.196+0000 [id=39]        INFO        jenkins.InitReactorRunner$1#>
+
+
+The Jenkins URL is used to provide the root URL for absolute links to various Jenkins resources. That means this value is required for proper operation of many Jenkins features including email notifications, PR status updates, and the BUILD_URL environment variable provided to build steps.
+The proposed default value shown is not saved yet and is generated from the current request, if possible. The best practice is to set this value to the URL that users are expected to use. This will avoid confusion when sharing or viewing links.

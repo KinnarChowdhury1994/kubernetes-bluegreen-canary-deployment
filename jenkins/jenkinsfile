@@ -1,0 +1,74 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_REGISTRY = 'kinnar1994'
+        DOCKER_IMAGE_NAME = 'nps'
+        GIT_BRANCH = 'main'
+        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials' // Jenkins credential ID for DockerHub
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                echo 'Checking out code from Git...'
+                checkout scm
+            }
+        }
+
+        stage('Build Backend Images') {
+            steps {
+                script {
+                    def services = ['service1', 'service2', 'service3', 'service4', 'service5', 'service6']
+                    for (service in services) {
+                        echo "Building Docker image for ${service}..."
+                        sh """
+                            docker build -t ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}-${service}:latest ./backend/${service}
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Build Frontend Image') {
+            steps {
+                echo 'Building Docker image for Frontend...'
+                sh """
+                    docker build -t ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}-frontend:latest ./frontend
+                """
+            }
+        }
+
+        stage('Push Images to DockerHub') {
+            steps {
+                script {
+                    docker.withRegistry('', DOCKER_CREDENTIALS_ID) {
+                        def services = ['service1', 'service2', 'service3', 'service4', 'service5', 'service6', 'frontend']
+                        for (service in services) {
+                            echo "Pushing Docker image for ${service}..."
+                            sh """
+                                docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}-${service}:latest
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Cleanup Docker') {
+            steps {
+                echo 'Cleaning up local Docker images...'
+                sh 'docker system prune -f'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Please check the logs.'
+        }
+    }
+}
